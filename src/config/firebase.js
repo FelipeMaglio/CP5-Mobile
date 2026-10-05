@@ -7,14 +7,13 @@ import {
 import { getFirestore } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// ⚠️ Substitua pelos dados do SEU projeto Firebase (Console > Configurações do projeto)
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_PROJETO.firebaseapp.com",
-  projectId: "SEU_PROJETO",
-  storageBucket: "SEU_PROJETO.appspot.com",
-  messagingSenderId: "SEU_SENDER_ID",
-  appId: "SEU_APP_ID",
+  apiKey: "AIzaSyAfuEtVBGzHbDnDrm8AmwYv_loai8BS0qc",
+  authDomain: "cp5-mobile-d9f68.firebaseapp.com",
+  projectId: "cp5-mobile-d9f68",
+  storageBucket: "cp5-mobile-d9f68.firebasestorage.app",
+  messagingSenderId: "109375351766",
+  appId: "1:109375351766:web:53dcfa10953d7bc46c5277",
 };
 
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);

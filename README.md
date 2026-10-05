@@ -6,8 +6,9 @@
 **Turma:** 2TDS
 
 ## Integrantes
-- Felipe Maglio Filho — RM563512
-- Mateus Granja dos Santos — RM564930
+- [Nome completo 1] — RM [00000]
+- [Nome completo 2] — RM [00000]
+- [Nome completo 3] — RM [00000]
 
 ## Descrição do projeto
 Aplicativo mobile desenvolvido em **React Native (Expo)** com integração ao **Firebase Authentication**, permitindo cadastro, login, logout, recuperação de senha, exclusão de conta e persistência de sessão via **AsyncStorage**.
