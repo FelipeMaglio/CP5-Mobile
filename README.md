@@ -3,54 +3,88 @@
 **Curso:** Tecnologia em Desenvolvimento de Sistemas - 2TDS
 **Componente Curricular:** Mobile Application Development
 **Professor:** Fernando Pinéo
-**Turma:** 2TDS
 
 ## Integrantes
-- [Nome completo 1] — RM [00000]
-- [Nome completo 2] — RM [00000]
-- [Nome completo 3] — RM [00000]
+- Felipe Maglio Filho — RM563512
+- Mateus Granja dos Santos — RM564930
+
+## Vídeo de demonstração
+https://youtu.be/lwUeggh1Gvc
 
 ## Descrição do projeto
-Aplicativo mobile desenvolvido em **React Native (Expo)** com integração ao **Firebase Authentication**, permitindo cadastro, login, logout, recuperação de senha, exclusão de conta e persistência de sessão via **AsyncStorage**.
+Aplicativo mobile de **lista de tarefas** desenvolvido em **React Native (Expo)**, evolução do CheckPoint 4. Mantém toda a autenticação com **Firebase Authentication** e adiciona o **Cloud Firestore** como banco de dados, com CRUD completo e dados isolados por usuário.
 
-### Funcionalidades implementadas
-- Cadastro de usuário (nome, e-mail, senha, confirmação) com validações de campos obrigatórios, formato de e-mail e senhas iguais
-- Login com e-mail e senha, com mensagens de erro adequadas
-- Persistência da sessão: o app reabre já autenticado, sem exigir novo login
-- Logout, removendo a sessão local
-- Recuperação de senha via e-mail (Firebase)
-- Exclusão de conta, com confirmação prévia, removendo o usuário do Firebase e os dados locais
-- Bloqueio de acesso às telas autenticadas para usuários não logados
+### Autenticação (CP4, mantida)
+- Cadastro (nome, e-mail, senha e confirmação) com validações
+- Login com mensagens de erro adequadas
+- Persistência da sessão com AsyncStorage (o app reabre já autenticado)
+- Logout
+- Recuperação de senha por e-mail
+- Exclusão de conta, com confirmação prévia
+- Telas autenticadas inacessíveis para usuários não logados
+- A senha não é armazenada no Firestore nem no AsyncStorage
 
-### Evolução do CheckPoint 5 (Cloud Firestore)
-Tema: **Lista de tarefas** (título, descrição, data e status).
-- **Create:** formulário com 4 campos e validação (campos vazios e data inválida)
-- **Read:** listagem carregada do Firestore, com mensagem "Nenhum registro encontrado." e pull-to-refresh
-- **Update:** edição de uma tarefa existente, refletida na lista
-- **Delete:** exclusão com confirmação e feedback de sucesso
-- **Perfil:** nome, e-mail, logout e exclusão de conta (Firebase Auth)
-- Cada usuário vê apenas seus registros: `usuarios/{uid}/registros/{id}`
+### Firestore (CP5)
+Tema: **lista de tarefas**, com os campos título, descrição, data e status.
+
+| Operação | Funcionalidade |
+|---|---|
+| Create | Formulário com 4 campos e validação (campos vazios e data inválida) |
+| Read | Listagem carregada do Firestore, com a mensagem "Nenhum registro encontrado." quando vazia |
+| Update | Edição de uma tarefa existente; a lista mostra o dado atualizado |
+| Delete | Exclusão com confirmação ("Tem certeza que deseja excluir este registro?") e feedback de sucesso |
+
+Também há uma tela de **Minha conta** com nome, e-mail, logout e exclusão de conta, obtidos do Firebase Authentication.
+
+### Relação dos dados com o usuário autenticado
+Os registros ficam em uma subcoleção do usuário:
+
+```
+usuarios
+ └── {uid do usuário}
+      └── registros
+           ├── {id da tarefa}
+           └── {id da tarefa}
+```
+
+As regras de segurança (`firestore.rules`) permitem que cada usuário leia e escreva somente em `usuarios/{seu uid}/registros`:
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /usuarios/{uid}/registros/{registroId} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}
+```
 
 ## Tecnologias utilizadas
-- Cloud Firestore (`firebase/firestore`)
 - React Native + Expo
-- Firebase Authentication (`firebase` JS SDK)
+- Firebase Authentication
+- Cloud Firestore
 - AsyncStorage (`@react-native-async-storage/async-storage`)
 - React Navigation (native-stack)
 
-## Configuração do Firebase
-1. Crie um projeto em https://console.firebase.google.com
-2. Ative o método de login **E-mail/Senha** em *Authentication > Sign-in method*
-3. Copie as credenciais do projeto (Configurações do projeto > Seus apps > Web)
-4. Crie o banco em *Firestore Database* e publique as regras do arquivo `firestore.rules` (aba Regras)
-5. Cole os valores em `src/config/firebase.js` no objeto `firebaseConfig`
+## Como executar
+Pré-requisito: Node.js (LTS) e o app **Expo Go** no celular (ou um emulador Android).
 
-## Instalação e execução
 ```bash
+git clone https://github.com/FelipeMaglio/CP5-Mobile.git
+cd CP5-Mobile
 npm install
 npx expo start
 ```
-Escaneie o QR code com o app **Expo Go** (Android/iOS) ou rode em um emulador.
+
+Escaneie o QR code com o Expo Go, ou aperte `a` para abrir no emulador Android.
+
+A configuração do Firebase está em `src/config/firebase.js`. Para usar outro projeto Firebase:
+1. Ative **E-mail/senha** em Authentication.
+2. Crie o banco em Firestore Database e publique as regras do arquivo `firestore.rules`.
+3. Troque os valores de `firebaseConfig` em `src/config/firebase.js`.
+
+> O arquivo `metro.config.js` é necessário para o Firebase Auth funcionar com o Expo atual. Não remova.
 
 ## Estrutura do projeto
 ```
@@ -58,12 +92,13 @@ CP5-Mobile/
 ├── App.js
 ├── app.json
 ├── package.json
-├── firestore.rules          # regras de segurança do Firestore
+├── metro.config.js
+├── firestore.rules             # regras de segurança do Firestore
 └── src/
-    ├── config/firebase.js       # inicialização do Firebase + persistência
-    ├── context/AuthContext.js   # regras de negócio de autenticação
+    ├── config/firebase.js      # inicialização do Firebase, Auth e Firestore
+    ├── context/AuthContext.js  # regras de negócio de autenticação
     ├── services/tarefasService.js  # CRUD no Firestore
-    ├── navigation/index.js      # rotas públicas/privadas
+    ├── navigation/index.js     # rotas públicas/privadas
     └── screens/
         ├── LoginScreen.js
         ├── SignUpScreen.js
